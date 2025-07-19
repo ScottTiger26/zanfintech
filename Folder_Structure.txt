@@ -1,0 +1,53 @@
+zan-fintech-solutions/
+│
+├── backend/                     # Django backend
+│   ├── zan_fintech/            # Django project root
+│   │   ├── __init__.py
+│   │   ├── asgi.py
+│   │   ├── settings.py         # Split into settings/base.py, dev.py, prod.py (optional)
+│   │   ├── urls.py
+│   │   ├── wsgi.py
+│   │
+│   ├── apps/                   # All Django apps
+│   │   ├── users/              # Authentication, user profile
+│   │   ├── news/               # Articles, editorials
+│   │   ├── videos/             # Video content and playlists
+│   │   ├── analytics/          # Stock data, charts, insights
+│   │   └── core/               # Utilities, shared models, etc.
+│   │
+│   ├── media/                  # Uploaded media files
+│   ├── static/                 # Collected static files (CSS, JS)
+│   ├── requirements.txt        # Python dependencies
+│   ├── manage.py
+│   └── .env                    # Environment variables
+│
+├── frontend/                   # React frontend (Vite/CRA/Next.js)
+│   ├── public/                 # Static assets (favicon, index.html)
+│   ├── src/
+│   │   ├── assets/             # Images, fonts, icons
+│   │   ├── components/         # Reusable UI components
+│   │   ├── features/           # Feature-wise modules (News, Videos, Stocks)
+│   │   ├── pages/              # Page-level components
+│   │   ├── services/           # API calls (axios)
+│   │   ├── redux/              # Redux toolkit or Zustand stores
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── tailwind.config.js  # Or any other CSS setup
+│   │
+│   ├── package.json
+│   └── .env
+│
+├── nginx/                      # Nginx config for production
+│   ├── default.conf
+│   └── ssl/                    # SSL certs (Let's Encrypt or custom)
+│
+├── deploy/                     # Deployment scripts (Docker, CI/CD)
+│   ├── docker-compose.yml
+│   ├── Dockerfile.backend
+│   ├── Dockerfile.frontend
+│   └── scripts/                # Bash scripts for server setup
+│
+├── docs/                       # Project documentation, architecture diagrams
+│   └── README.md
+│
+└── README.md
