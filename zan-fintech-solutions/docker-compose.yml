@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: zan-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: zan-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+
+  nginx:
+    image: nginx:alpine
+    container_name: zan-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - backend
+      - frontend
+
+  db:
+    image: postgres:13
+    container_name: zan-db
+    environment:
+      POSTGRES_USER: zanuser
+      POSTGRES_PASSWORD: zanpass
+      POSTGRES_DB: zanfdb
+    ports:
+      - "5432:5432"
