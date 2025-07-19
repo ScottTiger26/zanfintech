@@ -1,41 +1,37 @@
-version: "3.8"
+# docker-compose.yml
+version: '3.9'
 
 services:
   backend:
     build: ./backend
-    container_name: zan-backend
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
+    env_file:
+      - ./backend/.env
     depends_on:
       - db
 
   frontend:
     build: ./frontend
-    container_name: zan-frontend
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/app
-
-  nginx:
-    image: nginx:alpine
-    container_name: zan-nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-    depends_on:
-      - backend
-      - frontend
+    environment:
+      - HOST=0.0.0.0
+    command: npm run dev
 
   db:
-    image: postgres:13
-    container_name: zan-db
+    image: postgres:15
+    restart: always
     environment:
-      POSTGRES_USER: zanuser
-      POSTGRES_PASSWORD: zanpass
-      POSTGRES_DB: zanfdb
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: zanfintech
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
