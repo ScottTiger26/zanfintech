@@ -1,51 +1,49 @@
-name: 🚀 Deploy to Production
+name: Deploy ZanFinTech
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: self-hosted
 
-
     steps:
-      - name: 📥 Checkout repo
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: 🔐 Setup SSH
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
 
-      - name: 🚀 SSH and deploy
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SERVER_IP }} << 'EOF'
-            cd /home/vishwajeet/zanfintech/zan-fintech-solutions
+    - name: Install dependencies (backend)
+      working-directory: backend
+      run: |
+        pip install -r requirements.txt
 
-            echo "🔄 Pulling latest code"
-            git reset --hard
-            git pull origin master
+    - name: Apply Django migrations
+      working-directory: backend
+      run: |
+        python manage.py migrate
 
-            echo "📦 Backend setup"
-            source backend/venv/bin/activate
-            cd backend
-            pip install -r requirements.txt
-            python manage.py migrate
-            python manage.py collectstatic --noinput
-            cd ..
+    - name: Collect static files
+      working-directory: backend
+      run: |
+        python manage.py collectstatic --noinput
 
-            echo "🛠 Building frontend"
-            cd frontend
-            npm install
-            npm run build
-            cd ..
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
 
-            echo "📁 Copy frontend build to staticfiles"
-            rm -rf backend/staticfiles/*
-            cp -r frontend/dist/* backend/staticfiles/
+    - name: Install and build frontend
+      working-directory: frontend
+      run: |
+        npm install
+        npm run build
 
-            echo "♻️ Restarting backend"
-            sudo supervisorctl restart zanbackend
-          EOF
+    - name: Restart Supervisor and Nginx
+      run: |
+        sudo systemctl restart supervisor
+        sudo systemctl restart nginx
