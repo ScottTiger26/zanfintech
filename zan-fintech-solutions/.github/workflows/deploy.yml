@@ -22,12 +22,29 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SERVER_IP }} << 'EOF'
             cd /home/vishwajeet/zanfintech/zan-fintech-solutions
+
+            echo "🔄 Pulling latest code"
             git reset --hard
             git pull origin master
+
+            echo "📦 Backend setup"
             source backend/venv/bin/activate
             cd backend
             pip install -r requirements.txt
             python manage.py migrate
             python manage.py collectstatic --noinput
+            cd ..
+
+            echo "🛠 Building frontend"
+            cd frontend
+            npm install
+            npm run build
+            cd ..
+
+            echo "📁 Copy frontend build to staticfiles"
+            rm -rf backend/staticfiles/*
+            cp -r frontend/dist/* backend/staticfiles/
+
+            echo "♻️ Restarting backend"
             sudo supervisorctl restart zanbackend
           EOF
